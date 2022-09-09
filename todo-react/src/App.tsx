@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import styled, { createGlobalStyle } from "styled-components";
 import Button from "./components/common/Button";
+import { buttonTypes } from "./types/button";
 
 const GlobalStyle = createGlobalStyle`
 
@@ -29,12 +30,28 @@ html,body,#root{
   --rounded-default:20px;
   --rounded-small:5px;
 }
-
-
-
 `;
 
 function App() {
+  type StatusType = { [key in typeof buttonTypes[number]]?: boolean };
+  const [status, setStatus] = useState<StatusType>({
+    edit: false,
+    plus: true,
+    delete: false,
+  });
+
+  const changeStatus = (target: typeof buttonTypes[number]) => {
+    let setAllFalse: StatusType = {
+      delete: false,
+      edit: false,
+      plus: false,
+    };
+
+    setAllFalse[target] = true;
+
+    setStatus(setAllFalse);
+  };
+
   return (
     <React.Fragment>
       <GlobalStyle />
@@ -42,9 +59,21 @@ function App() {
         <ContainerStyled>
           <ListBoxStyled></ListBoxStyled>
           <ButtonBoxStyled>
-            <Button label="Edit" />
-            <Button label="Plus/Home" />
-            <Button label="Remove" />
+            <Button
+              type="edit"
+              on={status.edit}
+              onClick={() => changeStatus("edit")}
+            />
+            <Button
+              type={status.plus ? "plus" : "home"}
+              on={status.plus}
+              onClick={() => changeStatus("plus")}
+            />
+            <Button
+              type="delete"
+              on={status.delete}
+              onClick={() => changeStatus("delete")}
+            />
           </ButtonBoxStyled>
         </ContainerStyled>
       </AppStyled>
@@ -72,6 +101,7 @@ const ContainerStyled = styled.div`
   height: 100%;
   padding: 10px;
   border-radius: var(--rounded-default);
+  gap: 10px;
 
   background: var(--color-white);
 `;
@@ -88,9 +118,11 @@ const ListBoxStyled = styled.ul`
 
 const ButtonBoxStyled = styled.div`
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, auto);
+  justify-content: center;
 
   width: 100%;
+  gap: 45px;
 `;
 
 export default App;
